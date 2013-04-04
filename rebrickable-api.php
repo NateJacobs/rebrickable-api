@@ -53,7 +53,7 @@
 	 */
 	public function constants() 
 	{
-		define( 'REBRICKABLE_API_VERSION', '1.2' );
+		define( 'REBRICKABLE_API_VERSION', '1.0' );
 		define( 'REBRICKABLE_API_DIR', trailingslashit( plugin_dir_path( __FILE__ ) ) );
 		define( 'REBRICKABLE_API_URI', trailingslashit( plugin_dir_url( __FILE__ ) ) );
 		define( 'REBRICKABLE_API_INCLUDES', REBRICKABLE_API_DIR . trailingslashit( 'inc' ) );
