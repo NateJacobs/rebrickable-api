@@ -94,7 +94,7 @@
 		if ( is_admin() ) 
 		{
 			require_once( REBRICKABLE_API_ADMIN . 'class-settings-page.php' );
-			//require_once( REBRICKABLE_API_ADMIN . 'class-users-profile.php' );
+			require_once( REBRICKABLE_API_ADMIN . 'class-users-profile.php' );
 		}
 	}
 	
