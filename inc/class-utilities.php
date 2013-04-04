@@ -14,10 +14,11 @@ class RebrickAPIUtilities
 /** 
 	 *	Remote Request
 	 *
-	 *	Send the api request to Brickset. Returns an XML formatted response.
+	 *	Send the api request to Rebrickable. Returns an XML formatted response.
 	 *
 	 *	@author		Nate Jacobs
-	 *	@since		0.1
+	 *	@date		4/2/13
+	 *	@since		1.0
 	 *	@updated	1.0
 	 *
 	 *	@param		string	$extra_url (url needed after base url)
@@ -60,12 +61,29 @@ class RebrickAPIUtilities
 		{
 			return new WP_Error( $response_code, __( 'Unknown error occurred', 'rebrick_api') );
 		}
-/*
-		elseif( $extra_url != 'login' && 300 > strlen( $response_body ) && $type == 'get' )
+		elseif( ctype_upper( $response_body ) )
 		{
-				return new WP_Error( 'rebrick-no-data', __( 'Sorry, no parts/sets were found for that query', 'rebrick_api' ) );
+			if( 'INVALIDKEY' === $response_body )
+				return new WP_Error( 'rebrick-invalid-key', __( 'The API Key is invalid.', 'rebrick_api' ) );
+			
+			if( 'INVALIDUSERPASS' === $response_body )
+				return new WP_Error( 'rebrick-invalid-user-pass', __( 'Invalid user email or password.', 'rebrick_api' ) );
+				
+			if( 'NOUSER' === $response_body )
+				return new WP_Error( 'rebrick-no-user', __( 'The Rebrickable user does not exist.', 'rebrick_api' ) );
+				
+			if( 'INVALIDPASS' === $response_body )
+				return new WP_Error( 'rebrick-invalid-pass', __( 'The password does not match the user.', 'rebrick_api' ) );
+				
+			if( 'INVALIDHASH' === $response_body )
+				return new WP_Error( 'rebrick-invalid-hash', __( 'The hash key does not match a user/password.', 'rebrick_api' ) );
+				
+			if( 'NOSET' === $response_body )
+				return new WP_Error( 'rebrick-no-set', __( 'No sets were found for that query.', 'rebrick_api' ) );
+				
+			if( 'NOPART' === $response_body )
+				return new WP_Error( 'rebrick-no-part', __( 'No parts or colors were found for that query.', 'rebrick_api' ) );					
 		}
-*/
 		else
 		{
 			return $response_body;
@@ -80,7 +98,8 @@ class RebrickAPIUtilities
 	 *	in the *_usersmeta table.
 	 *
 	 *	@author		Nate Jacobs
-	 *	@since		0.1
+	 *	@date		4/3/13
+	 *	@since		1.0
 	 *	@updated	1.0
 	 *
 	 *	@param	int 	$user_id
