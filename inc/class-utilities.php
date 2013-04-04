@@ -33,7 +33,7 @@ class RebrickAPIUtilities
 		if( 'get' == $type )
 		{
 //wp_die( $api_url.'/'.$extra_url.'?'.$params );
-			$response = wp_remote_get( $api_url.'/'.$extra_url.'?'.$params ); //'?key='.self::get_api_key().'&'.$params.'&format=json'
+			$response = wp_remote_get( $api_url.'/'.$extra_url.'?'.$params ); 
 		}
 		elseif( 'post' == $type )
 		{
@@ -60,13 +60,53 @@ class RebrickAPIUtilities
 		{
 			return new WP_Error( $response_code, __( 'Unknown error occurred', 'rebrick_api') );
 		}
+/*
 		elseif( $extra_url != 'login' && 300 > strlen( $response_body ) && $type == 'get' )
 		{
 				return new WP_Error( 'rebrick-no-data', __( 'Sorry, no parts/sets were found for that query', 'rebrick_api' ) );
 		}
+*/
 		else
 		{
 			return $response_body;
+		}
+	}
+	
+	/** 
+	 *	Login Service Method
+	 *
+	 *	Authenticates a user with Rebrick and returns a hash.
+	 *	The hash is then stored as a meta value with the key of 'rebrick_user_hash'
+	 *	in the *_usersmeta table.
+	 *
+	 *	@author		Nate Jacobs
+	 *	@since		0.1
+	 *	@updated	1.0
+	 *
+	 *	@param	int 	$user_id
+	 *	@param	string 	$email
+	 *	@param	string	$password
+	 *
+	 *	@return	array	$response (if there is an error, a WP_Error array is returned)
+	 */
+	protected function rebrick_login( $user_id, $email, $password )
+	{
+		// Which user is this?
+		$user = get_userdata( $user_id );
+		
+		// Build the parameters
+		$params = 'key='.self::get_api_key().'&email='.urlencode( $email ).'&pass='.urlencode( $password );
+		
+		// Send it off
+		$response = $this->remote_request( 'get', 'get_user_hash', $params );
+		
+		if( is_wp_error( $response ) )
+		{
+			return $response;
+		}
+		else
+		{
+			update_user_meta( $user->ID, 'rebrick_user_hash',  (string) $response );
 		}
 	}
 	
@@ -75,6 +115,24 @@ class RebrickAPIUtilities
 		$settings = (array) get_option( 'rebrick-api-settings' );
 		
 		return (isset( $settings['api_key'] ) ? $settings['api_key'] : '');
+	}
+	
+	/** 
+	*	Get UserHash
+	*
+	*	Returns the Rebrick userHash from user_meta
+	*
+	*	@author		Nate Jacobs
+	*	@date		4/3/13
+	*	@since		1.0
+	*
+	*	@param		int	$user_id
+	*
+	*	@return		string	$user_hash
+	*/
+	protected function get_user_hash( $user_id )
+	{
+		return get_user_meta( $user_id, 'rebrick_user_hash', true );
 	}
 	
 	/** 
