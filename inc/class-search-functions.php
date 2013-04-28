@@ -213,4 +213,27 @@ class RebrickAPISearch extends RebrickAPIUtilities
 		// Have we stored a transient?
 		return $this->check_transient( $transient, array( 'set' => $safe_set_id, 'user_id' => $user_id ), 'get_set_match'  );
 	}
+	
+	/** 
+	*	Get User Parts
+	*
+	*	Use this service to get a user's list of loose parts as shown on their My Parts page.
+	*
+	*	@author		Nate Jacobs
+	*	@date		4/28/13
+	*	@since		1.0
+	*
+	*	@param		
+	*/
+	public function get_user_parts( $user_id )
+	{
+		// Is it a valid user?
+		if( is_wp_error( $validate_user = $this->validate_user( $user_id ) ) )	
+			return $validate_user;
+		
+		$transient = 'rebrick_get_user_parts-'.$user_id;	
+		
+		// Have we stored a transient?
+		return $this->check_transient( $transient, array( 'user_id' => $user_id ), 'get_user_parts'  );
+	}
 }
