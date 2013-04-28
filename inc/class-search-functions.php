@@ -49,7 +49,7 @@ class RebrickAPISearch extends RebrickAPIUtilities
 		$transient = str_replace( '-', '', $safe_set_id );	
 		
 		// Have we stored a transient?
-		return $this->check_transient( $transient, array( 'set' => $safe_set_id ), 'get_set_parts'  );
+		return $this->check_transient( 'rebrick_set_parts-'.$transient, array( 'set' => $safe_set_id ), 'get_set_parts'  );
 	}
 	
 	/** 
@@ -140,7 +140,20 @@ class RebrickAPISearch extends RebrickAPIUtilities
 	*/
 	public function get_user_set( $user_id, $set_id )
 	{
+		// Is the set_id valid?
+		$safe_set_id = $this->validate_string( $set_id );
+		if( is_wp_error( $safe_set_id ) )
+			return $safe_set_id;
 		
+		// Is it a valid user?
+		if( is_wp_error( $validate_user = $this->validate_user( $user_id ) ) )	
+			return $validate_user;
+		
+		$safe_set_id = $this->validate_set_number( $safe_set_id );
+		$transient = 'rebrick_get_user_set-'.str_replace( '-', '', $safe_set_id ).'_user-'.$user_id;	
+		
+		// Have we stored a transient?
+		return $this->check_transient( $transient, array( 'set' => $safe_set_id, 'user_id' => $user_id ), 'get_user_set'  );
 	}
 	
 	/** 
