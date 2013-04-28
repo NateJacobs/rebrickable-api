@@ -39,7 +39,7 @@
 		add_action( 'plugins_loaded', array( $this, 'constants' ), 2 );
 		add_action( 'plugins_loaded', array( $this, 'includes' ), 3 );
 		add_action( 'plugins_loaded', array( $this, 'admin' ), 4 );
-		add_filter ( 'http_request_timeout', array ( $this, 'http_request_timeout' ) );
+		add_filter( 'http_request_timeout', array ( $this, 'http_request_timeout' ) );
 	}
 	
 	/** 
@@ -73,11 +73,11 @@
 	{
 		require_once( REBRICKABLE_API_INCLUDES . 'class-utilities.php' );
 		require_once( REBRICKABLE_API_INCLUDES . 'class-search-functions.php' );
+		require_once( REBRICKABLE_API_INCLUDES . 'class-update-functions.php' );
 		//require_once( REBRICKABLE_API_INCLUDES . 'class-oembed.php' );
 		//require_once( REBRICKABLE_API_INCLUDES . 'class-widgets.php' );
 		//require_once( REBRICKABLE_API_INCLUDES . 'class-template-tags.php' );
 		//require_once( REBRICKABLE_API_INCLUDES . 'class-shortcodes.php' );
-		//require_once( REBRICKABLE_API_INCLUDES . 'class-update-functions.php' );
 	}
 	
 	/** 
