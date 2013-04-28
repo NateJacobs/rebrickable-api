@@ -306,7 +306,7 @@ class RebrickAPIUtilities
 			{
 				$quantity = empty( $response ) ? '0' : $response;
 				
-				$response = json_encode( array( 'quantity' =>  $quantity ) );
+				$response = json_encode( array( 'qty' =>  $quantity ) );
 			}
 			
 			set_transient( $transient, $response, WEEK_IN_SECONDS );
