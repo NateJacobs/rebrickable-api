@@ -123,4 +123,61 @@ class RebrickAPISearch extends RebrickAPIUtilities
 		// Have we stored a transient?
 		return $this->check_transient( 'rebrick_colors', '', 'get_colors'  );
 	}
+	
+	/** 
+	*	Get User Set
+	*
+	*	Use this service to get a single set saved in the specified user's My Sets list. If they don't have the set, it will return a quantity of 0. 
+	*
+	*	@author		Nate Jacobs
+	*	@date		4/28/13
+	*	@since		1.0
+	*
+	*	@param		int	$user_id
+	*	@param		string	$set_id
+	*
+	*	@return		object	$set_data|WP_Error
+	*/
+	public function get_user_set( $user_id, $set_id )
+	{
+		
+	}
+	
+	/** 
+	*	Get User Sets
+	*
+	*	Use this service to get all the sets saved in the specified user's Set Lists.
+	*
+	*	@author		Nate Jacobs
+	*	@date		4/28/13
+	*	@since		1.0
+	*
+	*	@param		int	$user_id
+	*
+	*	@return		object	$set_list|WP_Error
+	*/
+	public function get_user_sets( $user_id )
+	{
+		
+	}
+	
+	/** 
+	*	Get Set Match
+	*
+	*	Use this service to find out how many parts the user needs to build the specified set. 
+	*	This will use any sets and loose parts the user has configured in their account. 
+	*
+	*	@author		Nate Jacobs
+	*	@date		4/28/13
+	*	@since		1.0
+	*
+	*	@param		int	$user_id
+	*	@param		string	$set_id
+	*
+	*	@return		object	$set_data|WP_Error
+	*/
+	public function get_set_match( $user_id, $set_id )
+	{
+		
+	}
 }
