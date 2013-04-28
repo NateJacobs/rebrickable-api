@@ -82,7 +82,10 @@ class RebrickAPIUtilities
 				return new WP_Error( 'rebrick-no-set', __( 'No sets were found for that query.', 'rebrick_api' ) );
 				
 			if( 'NOPART' === $response_body )
-				return new WP_Error( 'rebrick-no-part', __( 'No parts or colors were found for that query.', 'rebrick_api' ) );					
+				return new WP_Error( 'rebrick-no-part', __( 'No parts or colors were found for that query.', 'rebrick_api' ) );
+				
+			if( 'SUCCESS' === $response_body )
+				return $response_body;
 		}
 		else
 		{
