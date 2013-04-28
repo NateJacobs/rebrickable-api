@@ -44,11 +44,11 @@ class RebrickAPIUtilities
 		{
 			return new WP_Error( 'no-type-specified', __( 'Specify a type of request: get or post', 'bs_api') );
 		}
-		
+
 		// Did the HTTP request fail?
 		if( is_wp_error( $response ) )
 			return $response;
-		
+
 		$response_code = wp_remote_retrieve_response_code( $response );
 		$response_message = wp_remote_retrieve_response_message( $response );
 		$response_body = wp_remote_retrieve_body( $response );
@@ -184,6 +184,12 @@ class RebrickAPIUtilities
 			$args = $default;
 		}
 		
+		if( array_key_exists( 'user_id', $args ) )
+		{
+			$args['hash'] = $this->get_user_hash( $args['user_id'] );
+			unset( $args['user_id'] );
+		}
+		
 		$params = build_query( urlencode_deep( $args ) );
 //wp_die( $params );			
 		return $params;
@@ -240,6 +246,40 @@ class RebrickAPIUtilities
 	}
 	
 	/** 
+	*	Validate User ID
+	*
+	*	Takes a user ID and determines if it is an integer and is a valid user in the site
+	*
+	*	@author		Nate Jacobs
+	*	@date		4/28/13
+	*	@since		1.0
+	*
+	*	@param		int	$user_id
+	*
+	*	@return		object	WP_Error (if not a user or an int)
+	*	@return		bool	true (if a valid user and an int)
+	*/
+	protected function validate_user( $user_id )
+	{
+		// Is there a user?
+		if( empty( $user_id ) )
+			return new WP_Error( 'no-user-specified', __( 'No user specified.', 'rebrick_api' ) );
+			
+		// Is it an integer?
+		if( !is_int( $user_id ) )
+			return new WP_Error( 'no-user-specified', __( 'No user specified.', 'rebrick_api' ) );
+		
+		// Does the user_id specified exist on this site?
+		if( !get_user_by( 'id', $user_id ) )
+			return new WP_Error( 'not-valid-user', __( 'The user ID passed is not a valid user.', 'rebrick_api' ) );
+		
+		$user_hash = $this->get_user_hash( $user_id );
+			
+		if( empty( $user_hash ) )
+			return new WP_Error( 'no-user-hash', __( 'The user ID passed does not have a Brickset API identifier on file.', 'rebrick_api' ) );	
+	}
+	
+	/** 
 	*	Check Transient
 	*
 	*	
@@ -260,9 +300,15 @@ class RebrickAPIUtilities
 			$response = $this->remote_request( $type, $function, $params );
 
 			if( is_wp_error( $response ) )
-			{
 				return $response;
+			
+			if( 'get_user_set' === $function )
+			{
+				$quantity = empty( $response ) ? '0' : $response;
+				
+				$response = json_encode( array( 'quantity' =>  $quantity ) );
 			}
+			
 			set_transient( $transient, $response, WEEK_IN_SECONDS );
 		}
 		
