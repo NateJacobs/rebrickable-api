@@ -302,8 +302,11 @@ class RebrickAPIUtilities
 			if( is_wp_error( $response ) )
 				return $response;
 			
+			// check which api call was requested
 			if( 'get_user_set' === $function )
 			{
+				// set the quanity to 0 if the response is empty or NULL
+				// otherwise set quantity to the number returned
 				$quantity = empty( $response ) ? '0' : $response;
 				
 				$response = json_encode( array( 'qty' =>  $quantity ) );
@@ -312,6 +315,12 @@ class RebrickAPIUtilities
 			set_transient( $transient, $response, WEEK_IN_SECONDS );
 		}
 		
-		return json_decode( get_transient( $transient ) );
+		// get the transient into an object
+		$return = json_decode( get_transient( $transient ) );
+		
+		// check if the object is wrapped in an array with a key of [0] and that is the only key/value pair
+		$rebrick_data = array_key_exists( 0, $return ) && 1 === count( $return ) ? $return[0] : $return;
+		
+		return $rebrick_data;
 	}
 }
