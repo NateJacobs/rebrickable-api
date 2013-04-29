@@ -223,7 +223,9 @@ class RebrickAPISearch extends RebrickAPIUtilities
 	*	@date		4/28/13
 	*	@since		1.0
 	*
-	*	@param		
+	*	@param		int	$user_id
+	*
+	*	@return		object	$set_data|WP_Error
 	*/
 	public function get_user_parts( $user_id )
 	{
