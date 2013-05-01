@@ -146,11 +146,8 @@ class RebrickAPIUpdate extends RebrickAPIUtilities
 			return $response;
 		}
 		
-		// get the word SUCCESS into a string to compare
-		$test_string = substr( $response, strrpos( $response, ')' )+2, 7 );
-		
 		// if success is the string, return true indicating the parts were successfully updated
-		if( 'SUCCESS' === $test_string )
+		if( 'SUCCESS' === substr( $response, strrpos( $response, ')' )+2, 7 ) )
 		{
 			return true;
 		}
@@ -224,6 +221,44 @@ class RebrickAPIUpdate extends RebrickAPIUtilities
 	*/
 	public function update_user_sets( $user_id, $sets = array() )
 	{
+		// is it a valid user?
+		if( is_wp_error( $validate_user = $this->validate_user( $user_id ) ) )	
+			return $validate_user;
 		
+		// if there are no sets get out so no request is processed
+		if( empty( $sets ) )
+			return new WP_Error( 'sets-list', __( 'No sets have been provided.', 'rebrick_api' ) );
+		
+		// create string for each set
+		foreach( $sets as $key => $sets_value )
+		{
+			$safe_set_id = $this->validate_set_number( $sets_value['set'] );
+			
+			$update_sets[] = $safe_set_id.' '.$sets_value['qty'];
+		}
+		
+		// get all the sets into one comma separated string
+		$updated_set_list = implode( ',', $update_sets );
+		
+		// create the post body
+		$params = array( 'body' => array( 'key' => $this->get_api_key(), 'hash' => $this->get_user_hash( $user_id ), 'sets' => $updated_set_list ) );
+		
+		// send off the request
+		$response = $this->remote_request( 'post', 'set_user_sets', $params );
+		
+		// check if there is an error
+		if( is_wp_error( $response ) )
+		{
+			return $response;
+		}
+		elseif( 'SUCCESS' === substr( $response, 0, 7 ) )
+		{
+			// if success is the string, return true indicating the parts were successfully updated
+			return true;
+		}
+		else
+		{
+			return new WP_Error( 'sets-list', __( 'An error has occurred and Rebrickable did not process your request successfully.', 'rebrick_api' ) );
+		}
 	}
 }
