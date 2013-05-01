@@ -132,7 +132,7 @@ class RebrickAPIUtilities
 		}
 	}
 	
-	private function get_api_key()
+	protected function get_api_key()
 	{
 		$settings = (array) get_option( 'rebrick-api-settings' );
 		
@@ -276,7 +276,7 @@ class RebrickAPIUtilities
 		$user_hash = $this->get_user_hash( $user_id );
 			
 		if( empty( $user_hash ) )
-			return new WP_Error( 'no-user-hash', __( 'The user ID passed does not have a Brickset API identifier on file.', 'rebrick_api' ) );	
+			return new WP_Error( 'no-user-hash', __( 'The user ID passed does not have a Rebrickable API identifier on file.', 'rebrick_api' ) );	
 	}
 	
 	/** 
