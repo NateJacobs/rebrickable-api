@@ -31,7 +31,6 @@ class RebrickAPIUpdate extends RebrickAPIUtilities
 	*	Update User Parts
 	*
 	*	Use this service to set the list of loose parts saved in the specified user's My Parts list. 
-	*	It will first delete any existing parts, so you should always pass in the complete list. 
 	*	If any parts cannot be found in the database, they will be silently ignored. 
 	*
 	*	@author		Nate Jacobs
@@ -40,10 +39,116 @@ class RebrickAPIUpdate extends RebrickAPIUtilities
 	*
 	*	@param		int	$user_id
 	*	@param		array	$parts
+	*	@param		bool	$complete
+	*
+	*	@return		bool|object	$response|WP_Error
 	*/
-	public function update_user_parts( $user_id, $parts = array() )
+	public function update_user_parts( $user_id, $parts = array(), $complete = false )
 	{
+		// is it a valid user?
+		if( is_wp_error( $validate_user = $this->validate_user( $user_id ) ) )	
+			return $validate_user;
 		
+		// make sure complete is a boolean value
+		if( !is_bool( $complete ) )
+			return new WP_Error( 'parts-list', __( 'Set $complete to true or false.', 'rebrick_api' ) );
+		
+		// create empty holding array
+		$existing_parts = array();
+		
+		// is the full parts list passed in an array
+		if( false === $complete )
+		{
+			// delete the stored data to make sure we have the most up-to-date parts list
+			delete_transient( 'rebrick_get_user_parts-'.$user_id );
+			
+			// retrieve the existing parts
+			$search = RebrickAPISearch::get_user_parts( $user_id );
+
+			// turn returned object into array
+			foreach( $search->parts as $key => $old_parts )
+			{
+				$existing_parts[$key] = (array) $old_parts;
+			}
+			
+			// loop through and rename keys
+			foreach ( $existing_parts as $k => $v )
+			{
+			  	$existing_parts[$k]['part'] = $existing_parts[$k]['part_id'];
+			  	unset( $existing_parts[$k]['part_id'] );
+			  	
+			  	$existing_parts[$k]['color'] = $existing_parts[$k]['ldraw_color_id'];
+			  	unset( $existing_parts[$k]['ldraw_color_id'] );
+
+			}
+			
+			// search the existing parts for any matches in new parts
+			foreach( $parts as $new_key => $part )
+			{
+				foreach( $existing_parts as $key => $old_part )
+				{
+					$flag = false;
+					
+					// testing for matches
+					if( $existing_parts[$key]['part'] == $parts[$new_key]['part'] )
+					{
+						// found a match, update the quantity and color
+						$existing_parts[$key]['qty'] = $parts[$new_key]['qty'];
+						$existing_parts[$key]['color'] = $parts[$new_key]['color'];
+						$flag = true;
+						break;
+					}
+				}
+				
+				// no match found so add the new pieces to the existing parts
+				if( false === $flag )
+					$existing_parts[] = $parts[$new_key];
+			}
+		}
+		// the full parts list has been passed
+		elseif( true === $complete )
+		{
+			// change the name of the array
+			$existing_parts = $parts;
+		}
+		
+		// if there are no parts get out so no request is processed
+		if( empty( $existing_parts ) )
+			return new WP_Error( 'parts-list', __( 'No parts have been provided.', 'rebrick_api' ) );
+		
+		// create string for each part
+		foreach( $existing_parts as $key => $parts_value )
+		{
+			$update_parts[] = $parts_value['part'].' '.$parts_value['color'].' '.$parts_value['qty'];
+		}
+
+		// get all the parts into one comma separated string
+		$updated_parts_list = implode( ',', $update_parts );
+		
+		// create the post body
+		$params = array( 'body' => array( 'key' => $this->get_api_key(), 'hash' => $this->get_user_hash( $user_id ), 'parts' => $updated_parts_list ) );
+		
+		// send off the request
+		$response = $this->remote_request( 'post', 'set_user_parts', $params );
+		
+		// check if there is an error
+		if( is_wp_error( $response ) )
+		{
+			return $response;
+		}
+		
+		// get the word SUCCESS into a string to compare
+		$test_string = substr( $response, strrpos( $response, ')' )+2, 7 );
+		
+		// if success is the string, return true indicating the parts were successfully updated
+		if( 'SUCCESS' === $test_string )
+		{
+			return true;
+		}
+		else
+		{
+			return new WP_Error( 'parts-list', __( 'An error has occurred and Rebrickable did not process your request successfully.', 'rebrick_api' ) );
+		}
 	}
 	
 	/** 
