@@ -53,9 +53,6 @@ class RebrickAPIUpdate extends RebrickAPIUtilities
 		if( !is_bool( $complete ) )
 			return new WP_Error( 'parts-list', __( 'Set $complete to true or false.', 'rebrick_api' ) );
 		
-		// create empty holding array
-		$existing_parts = array();
-		
 		// is the full parts list passed in an array
 		if( false === $complete )
 		{
@@ -64,22 +61,34 @@ class RebrickAPIUpdate extends RebrickAPIUtilities
 			
 			// retrieve the existing parts
 			$search = RebrickAPISearch::get_user_parts( $user_id );
-
-			// turn returned object into array
-			foreach( $search->parts as $key => $old_parts )
-			{
-				$existing_parts[$key] = (array) $old_parts;
-			}
 			
-			// loop through and rename keys
-			foreach ( $existing_parts as $k => $v )
+			if( !empty( $search->parts ) )
 			{
-			  	$existing_parts[$k]['part'] = $existing_parts[$k]['part_id'];
-			  	unset( $existing_parts[$k]['part_id'] );
-			  	
-			  	$existing_parts[$k]['color'] = $existing_parts[$k]['ldraw_color_id'];
-			  	unset( $existing_parts[$k]['ldraw_color_id'] );
-
+			
+				// turn returned object into array
+				foreach( $search->parts as $key => $old_parts )
+				{
+					$existing_parts[$key] = (array) $old_parts;
+				}
+				
+				// loop through and rename keys
+				foreach ( $existing_parts as $k => $v )
+				{
+				  	$existing_parts[$k]['part'] = $existing_parts[$k]['part_id'];
+				  	unset( $existing_parts[$k]['part_id'] );
+				  	
+				  	$existing_parts[$k]['color'] = $existing_parts[$k]['ldraw_color_id'];
+				  	unset( $existing_parts[$k]['ldraw_color_id'] );
+	
+				}
+			}
+			else
+			{
+				// create empty holding array
+				$existing_parts = array();
+				
+				// set flag to false
+				$flag = false;
 			}
 			
 			// search the existing parts for any matches in new parts
@@ -167,7 +176,37 @@ class RebrickAPIUpdate extends RebrickAPIUtilities
 	*/
 	public function update_user_set( $user_id, $set_id, $quantity )
 	{
+		// is the set_id a string?
+		$safe_set_id = $this->validate_string( $set_id );
+		if( is_wp_error( $safe_set_id ) )
+			return $safe_set_id;
 		
+		// is it a valid user?
+		if( is_wp_error( $validate_user = $this->validate_user( $user_id ) ) )	
+			return $validate_user;
+		
+		// is the quantity an integer?
+		if( !is_int( $quantity ) )
+			return new WP_Error( 'no-integer', __( 'The quantity is not an integer.', 'rebrick_api' ) );
+		
+		$safe_set_id = $this->validate_set_number( $safe_set_id );
+		
+		// create the post body
+		$params = array( 'body' => array( 'key' => $this->get_api_key(), 'hash' => $this->get_user_hash( $user_id ), 'set' => $safe_set_id, 'qty' => $quantity ) );
+		
+		// send off the request
+		$response = $this->remote_request( 'post', 'set_user_set', $params );
+		
+		// check if there is an error
+		if( is_wp_error( $response ) )
+		{
+			return $response;
+		}
+		elseif( 'SUCCESS' === $response )
+		{
+			// if success is the string, return true indicating the set was successfully updated or added
+			return true;
+		}
 	}
 	
 	/** 
