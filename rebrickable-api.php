@@ -3,7 +3,7 @@
 /**
  *	Plugin Name: Rebrickable API
  *	Plugin URI: https://github.com/NateJacobs/rebrickable-api
- *	Description: 	
+ *	Description: Interact with the Rebrickable API to display your part and set detail from <a href="rebrickable.com>Rebrickable.com</a>. The plugin comes with a widget for displaying all the known colors and template tags to display part information. An API key from <a href="rebrickable.com/api>Rebrickable</a> is required.
  *	Version: 1.0
  *	Date: 4/1/13
  *	Author: Nate Jacobs
