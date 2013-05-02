@@ -207,7 +207,7 @@ class RebrickAPIUpdate extends RebrickAPIUtilities
 	}
 	
 	/** 
-	*	Update User Sets
+	*	Do not use - currently the API does not allow for decreasing the number of sets a user owns using a bulk change
 	*
 	*	Use this service to set the Rebrickable sets saved in the specified user's My Sets list. 
 	*	It will merge these sets with any existing sets. If any sets cannot be found in the database, they will be silently ignored. 
@@ -221,6 +221,8 @@ class RebrickAPIUpdate extends RebrickAPIUtilities
 	*/
 	public function update_user_sets( $user_id, $sets = array() )
 	{
+		return new WP_Error( 'sets-list', __( 'This is not a valid function at this time.', 'rebrick_api' ) );
+		
 		// is it a valid user?
 		if( is_wp_error( $validate_user = $this->validate_user( $user_id ) ) )	
 			return $validate_user;
