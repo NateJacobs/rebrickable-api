@@ -12,22 +12,6 @@
 class RebrickAPISearch extends RebrickAPIUtilities
 {
 	/** 
-	*	Construct Method
-	*
-	*	
-	*
-	*	@author		Nate Jacobs
-	*	@date		4/1/13
-	*	@since		1.0
-	*
-	*	@param		
-	*/
-	public function __construct()
-	{
-		
-	}
-
-	/** 
 	*	Get Set Parts
 	*
 	*	Use this service to get a list of all parts in a set. It includes both normal and spare parts.
