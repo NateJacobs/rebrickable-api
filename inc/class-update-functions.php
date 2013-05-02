@@ -12,22 +12,6 @@
 class RebrickAPIUpdate extends RebrickAPIUtilities
 {
 	/** 
-	*	Construct Method
-	*
-	*	
-	*
-	*	@author		Nate Jacobs
-	*	@date		4/28/13
-	*	@since		1.0
-	*
-	*	@param		
-	*/
-	public function __construct()
-	{
-		
-	}
-
-	/** 
 	*	Update User Parts
 	*
 	*	Use this service to set the list of loose parts saved in the specified user's My Parts list. 
