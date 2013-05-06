@@ -222,4 +222,29 @@ class RebrickAPISearch extends RebrickAPIUtilities
 		// Have we stored a transient?
 		return $this->check_transient( $transient, array( 'user_id' => $user_id ), 'get_user_parts'  );
 	}
+	
+	/** 
+	*	Get User Set Lists
+	*
+	*	Use this service to get the user's Set Lists. This can be used with get_user_sets to get the full list of sets for each setlist.
+	*
+	*	@author		Nate Jacobs
+	*	@date		5/5/13
+	*	@since		1.0
+	*
+	*	@param		int	$user_id
+	*
+	*	@return		object	$set_data|WP_Error
+	*/
+	public function get_user_set_lists( $user_id )
+	{
+		// Is it a valid user?
+		if( is_wp_error( $validate_user = $this->validate_user( $user_id ) ) )	
+			return $validate_user;
+		
+		$transient = 'rebrick_get_user_setlists-'.$user_id;	
+		
+		// Have we stored a transient?
+		return $this->check_transient( $transient, array( 'user_id' => $user_id ), 'get_user_setlists'  );
+	}
 }
