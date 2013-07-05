@@ -14,7 +14,7 @@ class RebrickAPIUtilities
 /** 
 	 *	Remote Request
 	 *
-	 *	Send the api request to Rebrickable. Returns an XML formatted response.
+	 *	Send the api request to Rebrickable. Returns a JSON formatted response.
 	 *
 	 *	@author		Nate Jacobs
 	 *	@date		4/2/13
